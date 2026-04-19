@@ -15,7 +15,7 @@
 name: Leo Lu
 education: CS @ Penn State
 currently: ML Intern @ Lockheed Martin
-next: Incoming SWE Intern @ Qualcomm
+next: Incoming Intern @ Qualcomm
 ```
 
 ---
