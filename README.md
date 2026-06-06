@@ -14,13 +14,13 @@
 ```yaml
 name: Leo Lu
 education: CS @ Penn State
-currently: ML Intern @ Lockheed Martin
-next: Incoming Intern @ Qualcomm
+currently: Swe Intern @ Qualcomm 
+prev: ML Intern @ Lockheed Martin
 ```
 
 ---
 
-### some pretty neat stuff
+### Neat Stuff 
 
 > **Surviv** 
 > 
@@ -45,7 +45,7 @@ next: Incoming Intern @ Qualcomm
 
 ---
 
-### tech i work with
+### Tech
 
 <p>
   <img src="https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white">
