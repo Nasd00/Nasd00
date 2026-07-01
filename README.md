@@ -6,7 +6,7 @@
 
 <p align="center">
   <a href="mailto:leo.hz.lu@gmail.com"><img src="https://img.shields.io/badge/leo.hz.lu%40gmail.com-EA4335?style=flat-square&logo=gmail&logoColor=white" alt="Email"></a>&nbsp;
-  <a href="https://linkedin.com/in/leohaozhelu"><img src="https://img.shields.io/badge/leohaozhelu-0A66C2?style=flat-square&logo=linkedin&logoColor=white" alt="LinkedIn"></a>
+  <a href="https://linkedin.com/in/leohaozhelu"><img src="https://img.shields.io/badge/LinkedIn-0A66C2?style=flat-square&logo=linkedin&logoColor=white" alt="LinkedIn"></a>
 </p>
 
 ---
