@@ -20,7 +20,7 @@ prev: ML Intern @ Lockheed Martin
 
 ---
 
-### Neat Stuff 
+### Neat Projects
 
 > **Surviv** 
 > 
