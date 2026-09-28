@@ -14,8 +14,8 @@
 ```yaml
 name: Leo Lu
 education: CS @ Penn State
-currently: Swe Intern @ Qualcomm 
-prev: ML Intern @ Lockheed Martin
+currently: National Science Foundation REU
+prev: SWE Intern @ Qualcomm, ML Intern @ Lockheed Martin
 ```
 
 ---
