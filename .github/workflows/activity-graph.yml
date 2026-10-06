@@ -1,6 +1,10 @@
 name: Update activity graph
 
 on:
+  push:
+    branches:
+      - main
+      - contribution-activity-graph
   schedule:
     - cron: "17 6 * * *"
   workflow_dispatch:
