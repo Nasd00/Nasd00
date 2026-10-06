@@ -79,6 +79,3 @@ prev: SWE Intern @ Qualcomm, ML Intern @ Lockheed Martin
 > 
 > [![GitHub](https://img.shields.io/badge/GitHub-181717?style=flat-square&logo=github&logoColor=white)](https://github.com/dumrich/MacroMate) [![Devpost](https://img.shields.io/badge/Devpost-003E54?style=flat-square&logo=devpost&logoColor=white)](https://devpost.com/software/macromate-9cjduy)
 >
-> <p align="center">
-  <img src="https://ghchart.rshah.org/fc9177/Nasd00" alt="GitHub contribution heatmap" width="100%">
-</p>
