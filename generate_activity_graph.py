@@ -36,6 +36,10 @@ query Activity($login: String!, $from: DateTime!, $to: DateTime!) {
 """
 
 
+class RestrictedContributionsError(ValueError):
+    """The supplied token cannot see every contribution in the time window."""
+
+
 def fetch_counts(token: str, now: datetime | None = None) -> dict[str, int]:
     if not token:
         raise ValueError("GH_PROFILE_TOKEN is required (classic PAT with read:user scope)")
@@ -82,7 +86,7 @@ def fetch_counts(token: str, now: datetime | None = None) -> dict[str, int]:
     if type(restricted) is not int or restricted < 0:
         raise ValueError("GitHub returned an incomplete restricted contribution count")
     if restricted:
-        raise ValueError(
+        raise RestrictedContributionsError(
             f"GitHub reports {restricted} restricted contributions that this token cannot access. "
             "Use a Nasd00 classic PAT with read:user scope and authorize any required organization SSO."
         )
@@ -191,10 +195,22 @@ def main() -> None:
     )
     args = parser.parse_args()
     now = datetime.now(timezone.utc)
-    counts = (
-        {"reviews": 22, "issues": 0, "pull_requests": 13, "commits": 65}
-        if args.preview else fetch_counts(os.environ.get("GH_PROFILE_TOKEN", ""), now)
-    )
+    if args.preview:
+        counts = {"reviews": 22, "issues": 0, "pull_requests": 13, "commits": 65}
+    else:
+        token = os.environ.get("GH_PROFILE_TOKEN", "")
+        if not token and os.environ.get("GITHUB_ACTIONS") == "true":
+            print("::error title=Missing profile token::GH_PROFILE_TOKEN is not available", flush=True)
+        try:
+            counts = fetch_counts(token, now)
+        except RestrictedContributionsError:
+            if os.environ.get("GITHUB_ACTIONS") == "true":
+                print(
+                    "::error title=Incomplete private contribution access::"
+                    "GH_PROFILE_TOKEN cannot read all contributions",
+                    flush=True,
+                )
+            raise
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(render_svg(counts, now, preview=args.preview), encoding="utf-8")
     print(f"Wrote {args.output}{' preview' if args.preview else f' from {sum(counts.values())} contributions'}")

@@ -54,7 +54,7 @@ class GraphTests(unittest.TestCase):
             }
         }
         urlopen.return_value.__enter__.return_value = io.BytesIO(json.dumps(response).encode())
-        with self.assertRaisesRegex(ValueError, "125 restricted contributions"):
+        with self.assertRaisesRegex(graph.RestrictedContributionsError, "125 restricted contributions"):
             graph.fetch_counts("test-token")
 
 
