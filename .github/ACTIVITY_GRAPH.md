@@ -1,6 +1,6 @@
 # Activity graph setup
 
-The graph uses the four `contributionsCollection` totals from GitHub's GraphQL API for the past 365 days. The repository list contains only public repositories. Private repository names and URLs are never published.
+The graph uses the four `contributionsCollection` totals from GitHub's GraphQL API for the past 365 days. The featured repositories are curated as `(name, url)` pairs in `FEATURED_REPOSITORIES` inside `generate_activity_graph.py` and render on the left as clickable links; the GraphQL request does not fetch repository names.
 
 The account owner reports code reviews that GitHub's contribution API currently returns as zero. When the calculated code review share would display as 0%, the graph shows a 1% minimum and subtracts one point from the largest displayed category. The SVG description records this display rule.
 

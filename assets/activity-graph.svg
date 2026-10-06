@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1000" height="430" viewBox="0 0 1000 430" role="img" aria-labelledby="title description">
-  <title id="title">GitHub activity mix, past 365 days</title>
-  <desc id="description">Code reviews: 1%, Issues: 8%, Pull requests: 8%, Commits: 83%. Updated 2026-10-06. Counts include accessible private repositories. Code reviews use a 1% display minimum because the account owner reports reviews that the API omits.</desc>
+  <title id="title">GitHub activity mix, preview</title>
+  <desc id="description">Illustrative preview based on the supplied screenshot. Code reviews: 22%, Issues: 0%, Pull requests: 13%, Commits: 65%.</desc>
   <style>
     .card { fill: #ffffff; stroke: #d0d7de; stroke-width: 1.5; }
     .pill { fill: #f6f8fa; stroke: #d0d7de; }
@@ -34,24 +34,23 @@
   <text class="heading" x="25" y="94">Activity overview</text>
   <path class="divider" d="M495 80 V405"/>
   <path d="M27 131 h14 v13 h-3 v5 l-4 -3 -4 3 v-5 h-3 z" fill="none" stroke="#57606a" stroke-width="1.7" stroke-linejoin="round"/>
-  <text class="body" x="51" y="145">Contributed to</text>
-  <text class="repo" x="51" y="177">BenjieN07/ShaoLab<title>BenjieN07/ShaoLab</title></text>
-<text class="repo" x="51" y="207">Victor-Xu99/VocoLabAI<title>Victor-Xu99/VocoLabAI</title></text>
-<text class="repo" x="51" y="237">abhichavali/Predictra<title>abhichavali/Predictra</title></text>
-  <text class="body" x="51" y="267">and 9 other public repositories</text>
+  <text class="body" x="51" y="145">Featured repositories</text>
+  <a href="https://github.com/psu-nittanyaiadvance/26-S-Lockheed-1" target="_blank" rel="noopener"><text class="repo" x="51" y="177">psu-nittanyaiadvance/26-S-Lockheed-1<title>psu-nittanyaiadvance/26-S-Lockheed-1</title></text></a>
+<a href="https://github.com/acmpsu/acm-website" target="_blank" rel="noopener"><text class="repo" x="51" y="207">acmpsu/acm-website<title>acmpsu/acm-website</title></text></a>
+<a href="https://github.com/Nasd00/iris" target="_blank" rel="noopener"><text class="repo" x="51" y="237">Nasd00/iris<title>Nasd00/iris</title></text></a>
   <path class="axis" d="M754 127 V357 M639 242 H869"/>
-  <polygon class="area" points="754.0,233.0 765.0,242.0 754.0,253.0 640.0,242.0"/>
-  <circle cx="754.0" cy="233.0" r="4.5" class="marker"><title>Code reviews: 1% minimum</title></circle>
-<circle cx="765.0" cy="242.0" r="4.5" class="marker"><title>Issues: 8%</title></circle>
-<circle cx="754.0" cy="253.0" r="4.5" class="marker"><title>Pull requests: 8%</title></circle>
-<circle cx="640.0" cy="242.0" r="4.5" class="marker"><title>Commits: 83%</title></circle>
-  <text class="percent" x="754" y="88" text-anchor="middle">1%+</text>
+  <polygon class="area" points="754.0,203.4 754.0,242.0 754.0,264.8 640.0,242.0"/>
+  <circle cx="754.0" cy="203.4" r="4.5" class="marker"><title>Code reviews: 22%</title></circle>
+<circle cx="754.0" cy="242.0" r="4.5" class="marker"><title>Issues: 0%</title></circle>
+<circle cx="754.0" cy="264.8" r="4.5" class="marker"><title>Pull requests: 13%</title></circle>
+<circle cx="640.0" cy="242.0" r="4.5" class="marker"><title>Commits: 65%</title></circle>
+  <text class="percent" x="754" y="88" text-anchor="middle">22%</text>
   <text class="label" x="754" y="109" text-anchor="middle">Code reviews</text>
-  <text class="percent" x="754" y="385" text-anchor="middle">8%</text>
+  <text class="percent" x="754" y="385" text-anchor="middle">13%</text>
   <text class="label" x="754" y="407" text-anchor="middle">Pull requests</text>
-  <text class="percent" x="598" y="235" text-anchor="middle">83%</text>
+  <text class="percent" x="598" y="235" text-anchor="middle">65%</text>
   <text class="label" x="598" y="257" text-anchor="middle">Commits</text>
-  <text class="percent" x="913" y="235" text-anchor="middle">8%</text>
+  <text class="percent" x="913" y="235" text-anchor="middle">0%</text>
   <text class="label" x="913" y="257" text-anchor="middle">Issues</text>
-  
+  <text class="small" x="26" y="407">Preview from supplied reference</text>
 </svg>

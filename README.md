@@ -81,5 +81,5 @@ prev: SWE Intern @ Qualcomm, ML Intern @ Lockheed Martin
 >
 ---
 <p align="center">
-  <img src="assets/activity-graph.svg" alt="Activity overview with recent public repositories and GitHub contribution percentages" width="1000">
+  <img src="assets/activity-graph.svg" alt="Activity overview with featured repositories and GitHub contribution percentages" width="1000">
 </p>

@@ -15,7 +15,11 @@ from urllib.request import Request, urlopen
 
 USERNAME = "Nasd00"
 OUTPUT = Path("assets/activity-graph.svg")
-PUBLIC_REPOSITORY_LIMIT = 3
+FEATURED_REPOSITORIES = (
+    ("psu-nittanyaiadvance/26-S-Lockheed-1", "https://github.com/psu-nittanyaiadvance/26-S-Lockheed-1"),
+    ("acmpsu/acm-website", "https://github.com/acmpsu/acm-website"),
+    ("Nasd00/iris", "https://github.com/Nasd00/iris"),
+)
 KINDS = (
     ("reviews", "Code reviews"),
     ("issues", "Issues"),
@@ -26,15 +30,6 @@ GRAPHQL = """
 query Activity($login: String!, $from: DateTime!, $to: DateTime!) {
   viewer { login }
   user(login: $login) {
-    repositoriesContributedTo(
-      first: 10
-      privacy: PUBLIC
-      contributionTypes: [COMMIT, ISSUE, PULL_REQUEST]
-      includeUserRepositories: true
-    ) {
-      totalCount
-      nodes { nameWithOwner isPrivate }
-    }
     contributionsCollection(from: $from, to: $to) {
       restrictedContributionsCount
       totalCommitContributions
@@ -54,8 +49,7 @@ class RestrictedContributionsError(ValueError):
 @dataclass(frozen=True)
 class Activity:
     counts: dict[str, int]
-    public_repositories: tuple[str, ...]
-    other_public_repositories: int
+    featured_repositories: tuple[tuple[str, str], ...] = FEATURED_REPOSITORIES
 
 
 def fetch_activity(token: str, now: datetime | None = None) -> Activity:
@@ -118,29 +112,7 @@ def fetch_activity(token: str, now: datetime | None = None) -> Activity:
     if any(type(value) is not int or value < 0 for value in counts.values()):
         raise ValueError("GitHub returned incomplete contribution counts")
 
-    connection = user.get("repositoriesContributedTo") or {}
-    total_public = connection.get("totalCount")
-    nodes = connection.get("nodes")
-    if type(total_public) is not int or total_public < 0 or not isinstance(nodes, list):
-        raise ValueError("GitHub returned incomplete public repository data")
-    public_names = []
-    for node in nodes:
-        if not isinstance(node, dict):
-            continue
-        if node.get("isPrivate") is not False:
-            raise ValueError("GitHub returned a non-public repository in the public list")
-        name = node.get("nameWithOwner")
-        if isinstance(name, str) and name and name not in public_names:
-            public_names.append(name)
-        if len(public_names) == PUBLIC_REPOSITORY_LIMIT:
-            break
-    if total_public < len(public_names):
-        raise ValueError("GitHub returned an inconsistent public repository count")
-    return Activity(
-        counts=counts,
-        public_repositories=tuple(public_names),
-        other_public_repositories=max(0, total_public - len(public_names)),
-    )
+    return Activity(counts=counts)
 
 
 def percentages(counts: dict[str, int]) -> dict[str, int]:
@@ -195,20 +167,12 @@ def render_svg(activity: Activity, generated_at: datetime, *, preview: bool = Fa
         for (kind, label), (x, y) in zip(KINDS, points)
     )
     repo_rows = "\n".join(
+        f'<a href="{escape(url)}" target="_blank" rel="noopener">'
         f'<text class="repo" x="51" y="{177 + index * 30}">'
         f'{escape(name if len(name) <= 41 else name[:38] + "…")}'
-        f'<title>{escape(name)}</title></text>'
-        for index, name in enumerate(activity.public_repositories)
+        f'<title>{escape(name)}</title></text></a>'
+        for index, (name, url) in enumerate(activity.featured_repositories)
     )
-    if activity.other_public_repositories:
-        other_repos = (
-            f'<text class="body" x="51" y="{177 + len(activity.public_repositories) * 30}">'
-            f'and {activity.other_public_repositories} other public repositories</text>'
-        )
-    elif not activity.public_repositories:
-        other_repos = '<text class="body" x="51" y="177">No public repositories to show</text>'
-    else:
-        other_repos = ""
     generated = generated_at.astimezone(timezone.utc).strftime("%Y-%m-%d")
     summary = ", ".join(f"{label}: {shares[kind]}%" for kind, label in KINDS)
     review_note = ""
@@ -263,9 +227,8 @@ def render_svg(activity: Activity, generated_at: datetime, *, preview: bool = Fa
   <text class="heading" x="25" y="94">Activity overview</text>
   <path class="divider" d="M495 80 V405"/>
   <path d="M27 131 h14 v13 h-3 v5 l-4 -3 -4 3 v-5 h-3 z" fill="none" stroke="#57606a" stroke-width="1.7" stroke-linejoin="round"/>
-  <text class="body" x="51" y="145">Contributed to</text>
+  <text class="body" x="51" y="145">Featured repositories</text>
   {repo_rows}
-  {other_repos}
   <path class="axis" d="M754 127 V357 M639 242 H869"/>
   <polygon class="area" points="{polygon}"/>
   {markers}
@@ -293,8 +256,6 @@ def main() -> None:
     if args.preview:
         activity = Activity(
             counts={"reviews": 22, "issues": 0, "pull_requests": 13, "commits": 65},
-            public_repositories=("CruidGals/surviv", "dumrich/MacroMate"),
-            other_public_repositories=0,
         )
     else:
         token = os.environ.get("GH_PROFILE_TOKEN", "")
