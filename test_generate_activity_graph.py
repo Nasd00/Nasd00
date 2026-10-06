@@ -30,6 +30,7 @@ class GraphTests(unittest.TestCase):
             "data": {
                 "viewer": {"login": "Nasd00"},
                 "user": {"contributionsCollection": {
+                    "restrictedContributionsCount": 0,
                     "totalCommitContributions": 65,
                     "totalIssueContributions": 0,
                     "totalPullRequestContributions": 13,
@@ -43,6 +44,18 @@ class GraphTests(unittest.TestCase):
         request = urlopen.call_args.args[0]
         self.assertEqual(request.get_header("Authorization"), "Bearer test-token")
         self.assertIn("2025-10-06", request.data.decode())
+
+    @patch("generate_activity_graph.urlopen")
+    def test_rejects_totals_when_private_contributions_are_restricted(self, urlopen):
+        response = {
+            "data": {
+                "viewer": {"login": "Nasd00"},
+                "user": {"contributionsCollection": {"restrictedContributionsCount": 125}},
+            }
+        }
+        urlopen.return_value.__enter__.return_value = io.BytesIO(json.dumps(response).encode())
+        with self.assertRaisesRegex(ValueError, "125 restricted contributions"):
+            graph.fetch_counts("test-token")
 
 
 if __name__ == "__main__":

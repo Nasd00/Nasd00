@@ -25,6 +25,7 @@ query Activity($login: String!, $from: DateTime!, $to: DateTime!) {
   viewer { login }
   user(login: $login) {
     contributionsCollection(from: $from, to: $to) {
+      restrictedContributionsCount
       totalCommitContributions
       totalIssueContributions
       totalPullRequestContributions
@@ -77,6 +78,14 @@ def fetch_counts(token: str, now: datetime | None = None) -> dict[str, int]:
         raise ValueError(f"GH_PROFILE_TOKEN must belong to {USERNAME}; got {viewer or 'unknown'}")
     user = data.get("user") or {}
     collection = user.get("contributionsCollection") or {}
+    restricted = collection.get("restrictedContributionsCount")
+    if type(restricted) is not int or restricted < 0:
+        raise ValueError("GitHub returned an incomplete restricted contribution count")
+    if restricted:
+        raise ValueError(
+            f"GitHub reports {restricted} restricted contributions that this token cannot access. "
+            "Use a Nasd00 classic PAT with read:user scope and authorize any required organization SSO."
+        )
     fields = {
         "reviews": "totalPullRequestReviewContributions",
         "issues": "totalIssueContributions",
