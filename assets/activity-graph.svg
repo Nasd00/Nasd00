@@ -1,34 +1,57 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="620" height="420" viewBox="0 0 620 420" role="img" aria-labelledby="title description">
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="430" viewBox="0 0 1000 430" role="img" aria-labelledby="title description">
   <title id="title">GitHub activity mix, past 365 days</title>
-  <desc id="description">Code reviews: 0%, Issues: 8%, Pull requests: 8%, Commits: 84%. Updated 2026-10-06. Counts include accessible private repositories.</desc>
+  <desc id="description">Code reviews: 1%, Issues: 8%, Pull requests: 8%, Commits: 83%. Updated 2026-10-06. Counts include accessible private repositories. Code reviews use a 1% display minimum because the account owner reports reviews that the API omits.</desc>
   <style>
     .card { fill: #ffffff; stroke: #d0d7de; stroke-width: 1.5; }
-    .axis { stroke: #40c463; stroke-width: 2.5; }
-    .area { fill: #40c463; fill-opacity: .82; }
-    .marker { fill: #ffffff; stroke: #40c463; stroke-width: 2.5; }
-    .label { fill: #57606a; font: 18px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
-    .percent { fill: #8c959f; font: 14px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
-    .preview { fill: #8c959f; font: 10px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    .pill { fill: #f6f8fa; stroke: #d0d7de; }
+    .divider { stroke: #d0d7de; }
+    .axis { stroke: #176b2c; stroke-width: 2.5; }
+    .area { fill: #7dd787; fill-opacity: .72; }
+    .marker { fill: #ffffff; stroke: #176b2c; stroke-width: 2.5; }
+    .heading { fill: #1f2328; font: 20px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    .body { fill: #1f2328; font: 18px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    .repo { fill: #0969da; font: 600 18px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    .label { fill: #57606a; font: 17px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    .percent { fill: #57606a; font: 16px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    .small { fill: #656d76; font: 13px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
     @media (prefers-color-scheme: dark) {
       .card { fill: #0d1117; stroke: #30363d; }
+      .pill { fill: #161b22; stroke: #30363d; }
+      .divider { stroke: #30363d; }
+      .heading, .body { fill: #e6edf3; }
+      .repo { fill: #2f81f7; }
       .label { fill: #c9d1d9; }
       .percent { fill: #8b949e; }
+      .small { fill: #8b949e; }
       .marker { fill: #0d1117; }
     }
   </style>
-  <rect class="card" x="1" y="1" width="618" height="418" rx="4"/>
-  <path class="axis" d="M310 63 V347 M170 205 H450"/>
-  <polygon class="area" points="310.0,205.0 323.4,205.0 310.0,218.4 170.0,205.0"/>
-  <circle cx="323.4" cy="205.0" r="4.5" class="marker"><title>Issues: 8% (33 contributions)</title></circle>
-<circle cx="310.0" cy="218.4" r="4.5" class="marker"><title>Pull requests: 8% (33 contributions)</title></circle>
-<circle cx="170.0" cy="205.0" r="4.5" class="marker"><title>Commits: 84% (346 contributions)</title></circle>
-  <text class="percent" x="310" y="28" text-anchor="middle">0%</text>
-  <text class="label" x="310" y="49" text-anchor="middle">Code reviews</text>
-  <text class="percent" x="310" y="375" text-anchor="middle">8%</text>
-  <text class="label" x="310" y="397" text-anchor="middle">Pull requests</text>
-  <text class="percent" x="125" y="197" text-anchor="middle">84%</text>
-  <text class="label" x="125" y="219" text-anchor="middle">Commits</text>
-  <text class="percent" x="496" y="197" text-anchor="middle">8%</text>
-  <text class="label" x="496" y="219" text-anchor="middle">Issues</text>
+  <rect class="card" x="1" y="1" width="998" height="428" rx="5"/>
+  <rect class="pill" x="24" y="18" width="141" height="34" rx="8"/>
+  <text class="small" x="40" y="40">Past 365 days</text>
+  <rect class="pill" x="175" y="18" width="214" height="34" rx="8"/>
+  <text class="small" x="191" y="40">Public + private activity</text>
+  <text class="heading" x="25" y="94">Activity overview</text>
+  <path class="divider" d="M495 80 V405"/>
+  <path d="M27 131 h14 v13 h-3 v5 l-4 -3 -4 3 v-5 h-3 z" fill="none" stroke="#57606a" stroke-width="1.7" stroke-linejoin="round"/>
+  <text class="body" x="51" y="145">Contributed to</text>
+  <text class="repo" x="51" y="177">BenjieN07/ShaoLab<title>BenjieN07/ShaoLab</title></text>
+<text class="repo" x="51" y="207">Victor-Xu99/VocoLabAI<title>Victor-Xu99/VocoLabAI</title></text>
+<text class="repo" x="51" y="237">abhichavali/Predictra<title>abhichavali/Predictra</title></text>
+  <text class="body" x="51" y="267">and 9 other public repositories</text>
+  <path class="axis" d="M754 127 V357 M639 242 H869"/>
+  <polygon class="area" points="754.0,233.0 765.0,242.0 754.0,253.0 640.0,242.0"/>
+  <circle cx="754.0" cy="233.0" r="4.5" class="marker"><title>Code reviews: 1% minimum</title></circle>
+<circle cx="765.0" cy="242.0" r="4.5" class="marker"><title>Issues: 8%</title></circle>
+<circle cx="754.0" cy="253.0" r="4.5" class="marker"><title>Pull requests: 8%</title></circle>
+<circle cx="640.0" cy="242.0" r="4.5" class="marker"><title>Commits: 83%</title></circle>
+  <text class="percent" x="754" y="88" text-anchor="middle">1%+</text>
+  <text class="label" x="754" y="109" text-anchor="middle">Code reviews</text>
+  <text class="percent" x="754" y="385" text-anchor="middle">8%</text>
+  <text class="label" x="754" y="407" text-anchor="middle">Pull requests</text>
+  <text class="percent" x="598" y="235" text-anchor="middle">83%</text>
+  <text class="label" x="598" y="257" text-anchor="middle">Commits</text>
+  <text class="percent" x="913" y="235" text-anchor="middle">8%</text>
+  <text class="label" x="913" y="257" text-anchor="middle">Issues</text>
   
 </svg>
