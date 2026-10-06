@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="620" height="420" viewBox="0 0 620 420" role="img" aria-labelledby="title description">
-  <title id="title">GitHub activity mix, preview</title>
-  <desc id="description">Illustrative preview based on the supplied screenshot. Code reviews: 22%, Issues: 0%, Pull requests: 13%, Commits: 65%.</desc>
+  <title id="title">GitHub activity mix, past 365 days</title>
+  <desc id="description">Code reviews: 0%, Issues: 8%, Pull requests: 8%, Commits: 84%. Updated 2026-10-06. Counts include accessible private repositories.</desc>
   <style>
     .card { fill: #ffffff; stroke: #d0d7de; stroke-width: 1.5; }
     .axis { stroke: #40c463; stroke-width: 2.5; }
@@ -18,17 +18,17 @@
   </style>
   <rect class="card" x="1" y="1" width="618" height="418" rx="4"/>
   <path class="axis" d="M310 63 V347 M170 205 H450"/>
-  <polygon class="area" points="310.0,157.6 310.0,205.0 310.0,233.0 170.0,205.0"/>
-  <circle cx="310.0" cy="157.6" r="4.5" class="marker"><title>Code reviews: 22%</title></circle>
-<circle cx="310.0" cy="233.0" r="4.5" class="marker"><title>Pull requests: 13%</title></circle>
-<circle cx="170.0" cy="205.0" r="4.5" class="marker"><title>Commits: 65%</title></circle>
-  <text class="percent" x="310" y="28" text-anchor="middle">22%</text>
+  <polygon class="area" points="310.0,205.0 323.4,205.0 310.0,218.4 170.0,205.0"/>
+  <circle cx="323.4" cy="205.0" r="4.5" class="marker"><title>Issues: 8% (33 contributions)</title></circle>
+<circle cx="310.0" cy="218.4" r="4.5" class="marker"><title>Pull requests: 8% (33 contributions)</title></circle>
+<circle cx="170.0" cy="205.0" r="4.5" class="marker"><title>Commits: 84% (346 contributions)</title></circle>
+  <text class="percent" x="310" y="28" text-anchor="middle">0%</text>
   <text class="label" x="310" y="49" text-anchor="middle">Code reviews</text>
-  <text class="percent" x="310" y="375" text-anchor="middle">13%</text>
+  <text class="percent" x="310" y="375" text-anchor="middle">8%</text>
   <text class="label" x="310" y="397" text-anchor="middle">Pull requests</text>
-  <text class="percent" x="125" y="197" text-anchor="middle">65%</text>
+  <text class="percent" x="125" y="197" text-anchor="middle">84%</text>
   <text class="label" x="125" y="219" text-anchor="middle">Commits</text>
-  <text class="percent" x="496" y="197" text-anchor="middle">0%</text>
+  <text class="percent" x="496" y="197" text-anchor="middle">8%</text>
   <text class="label" x="496" y="219" text-anchor="middle">Issues</text>
-  <text class="preview" x="310" y="413" text-anchor="middle">Preview from supplied reference · live data pending</text>
+  
 </svg>
