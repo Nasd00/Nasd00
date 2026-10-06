@@ -56,16 +56,6 @@ prev: SWE Intern @ Qualcomm, ML Intern @ Lockheed Martin
 
 ---
 
-### Activity mix
-
-<p align="center">
-  <img src="assets/activity-graph.svg" alt="Share of commits, pull requests, issues, and code reviews over the past 365 days" width="620">
-</p>
-
-The graph updates daily from GitHub contributions, including private repositories available to my account.
-
----
-
 ### My work 👇
 
 > **Surviv** 
@@ -89,3 +79,7 @@ The graph updates daily from GitHub contributions, including private repositorie
 > 
 > [![GitHub](https://img.shields.io/badge/GitHub-181717?style=flat-square&logo=github&logoColor=white)](https://github.com/dumrich/MacroMate) [![Devpost](https://img.shields.io/badge/Devpost-003E54?style=flat-square&logo=devpost&logoColor=white)](https://devpost.com/software/macromate-9cjduy)
 >
+---
+<p align="center">
+  <img src="assets/activity-graph.svg">
+</p>
