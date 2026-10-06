@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from html import escape
 import json
@@ -14,6 +15,7 @@ from urllib.request import Request, urlopen
 
 USERNAME = "Nasd00"
 OUTPUT = Path("assets/activity-graph.svg")
+PUBLIC_REPOSITORY_LIMIT = 3
 KINDS = (
     ("reviews", "Code reviews"),
     ("issues", "Issues"),
@@ -24,6 +26,15 @@ GRAPHQL = """
 query Activity($login: String!, $from: DateTime!, $to: DateTime!) {
   viewer { login }
   user(login: $login) {
+    repositoriesContributedTo(
+      first: 10
+      privacy: PUBLIC
+      contributionTypes: [COMMIT, ISSUE, PULL_REQUEST]
+      includeUserRepositories: true
+    ) {
+      totalCount
+      nodes { nameWithOwner isPrivate }
+    }
     contributionsCollection(from: $from, to: $to) {
       restrictedContributionsCount
       totalCommitContributions
@@ -40,7 +51,14 @@ class RestrictedContributionsError(ValueError):
     """The supplied token cannot see every contribution in the time window."""
 
 
-def fetch_counts(token: str, now: datetime | None = None) -> dict[str, int]:
+@dataclass(frozen=True)
+class Activity:
+    counts: dict[str, int]
+    public_repositories: tuple[str, ...]
+    other_public_repositories: int
+
+
+def fetch_activity(token: str, now: datetime | None = None) -> Activity:
     if not token:
         raise ValueError("GH_PROFILE_TOKEN is required (classic PAT with read:user scope)")
 
@@ -99,7 +117,30 @@ def fetch_counts(token: str, now: datetime | None = None) -> dict[str, int]:
     counts = {kind: collection.get(field) for kind, field in fields.items()}
     if any(type(value) is not int or value < 0 for value in counts.values()):
         raise ValueError("GitHub returned incomplete contribution counts")
-    return counts
+
+    connection = user.get("repositoriesContributedTo") or {}
+    total_public = connection.get("totalCount")
+    nodes = connection.get("nodes")
+    if type(total_public) is not int or total_public < 0 or not isinstance(nodes, list):
+        raise ValueError("GitHub returned incomplete public repository data")
+    public_names = []
+    for node in nodes:
+        if not isinstance(node, dict):
+            continue
+        if node.get("isPrivate") is not False:
+            raise ValueError("GitHub returned a non-public repository in the public list")
+        name = node.get("nameWithOwner")
+        if isinstance(name, str) and name and name not in public_names:
+            public_names.append(name)
+        if len(public_names) == PUBLIC_REPOSITORY_LIMIT:
+            break
+    if total_public < len(public_names):
+        raise ValueError("GitHub returned an inconsistent public repository count")
+    return Activity(
+        counts=counts,
+        public_repositories=tuple(public_names),
+        other_public_repositories=max(0, total_public - len(public_names)),
+    )
 
 
 def percentages(counts: dict[str, int]) -> dict[str, int]:
@@ -116,73 +157,127 @@ def percentages(counts: dict[str, int]) -> dict[str, int]:
     return rounded
 
 
-def render_svg(counts: dict[str, int], generated_at: datetime, *, preview: bool = False) -> str:
+def display_percentages(counts: dict[str, int]) -> tuple[dict[str, int], bool]:
+    """Keep a visible review minimum when the API omits reported reviews."""
+    shares = percentages(counts)
+    review_minimum = bool(sum(counts.values())) and shares["reviews"] == 0
+    if review_minimum:
+        donor = max((kind for kind in shares if kind != "reviews"), key=shares.get)
+        shares[donor] -= 1
+        shares["reviews"] = 1
+    return shares, review_minimum
+
+
+def render_svg(activity: Activity, generated_at: datetime, *, preview: bool = False) -> str:
+    counts = activity.counts
     if set(counts) != {kind for kind, _ in KINDS} or any(
         type(value) is not int or value < 0 for value in counts.values()
     ):
         raise ValueError("Expected four nonnegative integer contribution counts")
 
-    shares = percentages(counts)
-    total = sum(counts.values())
-    cx, cy, radius = 310, 205, 140
-    largest = max(counts.values())
+    shares, review_minimum = display_percentages(counts)
+    cx, cy, radius = 754, 242, 114
+    largest = max(shares.values())
+    review_radius = radius * shares["reviews"] / largest if largest else 0
+    if review_minimum:
+        review_radius = max(review_radius, 9)
     points = [
-        (cx, cy - radius * counts["reviews"] / largest),
-        (cx + radius * counts["issues"] / largest, cy),
-        (cx, cy + radius * counts["pull_requests"] / largest),
-        (cx - radius * counts["commits"] / largest, cy),
+        (cx, cy - review_radius),
+        (cx + radius * shares["issues"] / largest, cy),
+        (cx, cy + radius * shares["pull_requests"] / largest),
+        (cx - radius * shares["commits"] / largest, cy),
     ] if largest else [(cx, cy)] * 4
     polygon = " ".join(f"{x:.1f},{y:.1f}" for x, y in points)
     markers = "\n".join(
         f'<circle cx="{x:.1f}" cy="{y:.1f}" r="4.5" class="marker">'
         f'<title>{escape(label)}: {shares[kind]}%'
-        f'{"" if preview else f" ({counts[kind]} contributions)"}</title></circle>'
+        f'{" minimum" if kind == "reviews" and review_minimum else ""}</title></circle>'
         for (kind, label), (x, y) in zip(KINDS, points)
-        if counts[kind]
     )
+    repo_rows = "\n".join(
+        f'<text class="repo" x="51" y="{177 + index * 30}">'
+        f'{escape(name if len(name) <= 41 else name[:38] + "…")}'
+        f'<title>{escape(name)}</title></text>'
+        for index, name in enumerate(activity.public_repositories)
+    )
+    if activity.other_public_repositories:
+        other_repos = (
+            f'<text class="body" x="51" y="{177 + len(activity.public_repositories) * 30}">'
+            f'and {activity.other_public_repositories} other public repositories</text>'
+        )
+    elif not activity.public_repositories:
+        other_repos = '<text class="body" x="51" y="177">No public repositories to show</text>'
+    else:
+        other_repos = ""
     generated = generated_at.astimezone(timezone.utc).strftime("%Y-%m-%d")
     summary = ", ".join(f"{label}: {shares[kind]}%" for kind, label in KINDS)
+    review_note = ""
+    if review_minimum:
+        review_note = (
+            " Code reviews use a 1% display minimum because the account owner reports reviews that the API omits."
+            if counts["reviews"] == 0
+            else " Code reviews use a 1% display minimum because the rounded share is below 1%."
+        )
     description = (
         f"Illustrative preview based on the supplied screenshot. {summary}."
         if preview
-        else f"{summary}. Updated {generated}. Counts include accessible private repositories."
+        else f"{summary}. Updated {generated}. Counts include accessible private repositories.{review_note}"
     )
-    footer = (
-        '<text class="preview" x="310" y="413" text-anchor="middle">'
-        'Preview from supplied reference · live data pending</text>'
+    preview_note = (
+        '<text class="small" x="26" y="407">Preview from supplied reference</text>'
         if preview else ""
     )
-    return f'''<svg xmlns="http://www.w3.org/2000/svg" width="620" height="420" viewBox="0 0 620 420" role="img" aria-labelledby="title description">
+    return f'''<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="430" viewBox="0 0 1000 430" role="img" aria-labelledby="title description">
   <title id="title">GitHub activity mix{', preview' if preview else ', past 365 days'}</title>
   <desc id="description">{escape(description)}</desc>
   <style>
     .card {{ fill: #ffffff; stroke: #d0d7de; stroke-width: 1.5; }}
-    .axis {{ stroke: #40c463; stroke-width: 2.5; }}
-    .area {{ fill: #40c463; fill-opacity: .82; }}
-    .marker {{ fill: #ffffff; stroke: #40c463; stroke-width: 2.5; }}
-    .label {{ fill: #57606a; font: 18px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }}
-    .percent {{ fill: #8c959f; font: 14px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }}
-    .preview {{ fill: #8c959f; font: 10px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }}
+    .pill {{ fill: #f6f8fa; stroke: #d0d7de; }}
+    .divider {{ stroke: #d0d7de; }}
+    .axis {{ stroke: #176b2c; stroke-width: 2.5; }}
+    .area {{ fill: #7dd787; fill-opacity: .72; }}
+    .marker {{ fill: #ffffff; stroke: #176b2c; stroke-width: 2.5; }}
+    .heading {{ fill: #1f2328; font: 20px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }}
+    .body {{ fill: #1f2328; font: 18px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }}
+    .repo {{ fill: #0969da; font: 600 18px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }}
+    .label {{ fill: #57606a; font: 17px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }}
+    .percent {{ fill: #57606a; font: 16px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }}
+    .small {{ fill: #656d76; font: 13px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }}
     @media (prefers-color-scheme: dark) {{
       .card {{ fill: #0d1117; stroke: #30363d; }}
+      .pill {{ fill: #161b22; stroke: #30363d; }}
+      .divider {{ stroke: #30363d; }}
+      .heading, .body {{ fill: #e6edf3; }}
+      .repo {{ fill: #2f81f7; }}
       .label {{ fill: #c9d1d9; }}
       .percent {{ fill: #8b949e; }}
+      .small {{ fill: #8b949e; }}
       .marker {{ fill: #0d1117; }}
     }}
   </style>
-  <rect class="card" x="1" y="1" width="618" height="418" rx="4"/>
-  <path class="axis" d="M310 63 V347 M170 205 H450"/>
+  <rect class="card" x="1" y="1" width="998" height="428" rx="5"/>
+  <rect class="pill" x="24" y="18" width="141" height="34" rx="8"/>
+  <text class="small" x="40" y="40">Past 365 days</text>
+  <rect class="pill" x="175" y="18" width="214" height="34" rx="8"/>
+  <text class="small" x="191" y="40">Public + private activity</text>
+  <text class="heading" x="25" y="94">Activity overview</text>
+  <path class="divider" d="M495 80 V405"/>
+  <path d="M27 131 h14 v13 h-3 v5 l-4 -3 -4 3 v-5 h-3 z" fill="none" stroke="#57606a" stroke-width="1.7" stroke-linejoin="round"/>
+  <text class="body" x="51" y="145">Contributed to</text>
+  {repo_rows}
+  {other_repos}
+  <path class="axis" d="M754 127 V357 M639 242 H869"/>
   <polygon class="area" points="{polygon}"/>
   {markers}
-  <text class="percent" x="310" y="28" text-anchor="middle">{shares['reviews']}%</text>
-  <text class="label" x="310" y="49" text-anchor="middle">Code reviews</text>
-  <text class="percent" x="310" y="375" text-anchor="middle">{shares['pull_requests']}%</text>
-  <text class="label" x="310" y="397" text-anchor="middle">Pull requests</text>
-  <text class="percent" x="125" y="197" text-anchor="middle">{shares['commits']}%</text>
-  <text class="label" x="125" y="219" text-anchor="middle">Commits</text>
-  <text class="percent" x="496" y="197" text-anchor="middle">{shares['issues']}%</text>
-  <text class="label" x="496" y="219" text-anchor="middle">Issues</text>
-  {footer}
+  <text class="percent" x="754" y="88" text-anchor="middle">{shares['reviews']}%{'+' if review_minimum else ''}</text>
+  <text class="label" x="754" y="109" text-anchor="middle">Code reviews</text>
+  <text class="percent" x="754" y="385" text-anchor="middle">{shares['pull_requests']}%</text>
+  <text class="label" x="754" y="407" text-anchor="middle">Pull requests</text>
+  <text class="percent" x="598" y="235" text-anchor="middle">{shares['commits']}%</text>
+  <text class="label" x="598" y="257" text-anchor="middle">Commits</text>
+  <text class="percent" x="913" y="235" text-anchor="middle">{shares['issues']}%</text>
+  <text class="label" x="913" y="257" text-anchor="middle">Issues</text>
+  {preview_note}
 </svg>
 '''
 
@@ -196,13 +291,17 @@ def main() -> None:
     args = parser.parse_args()
     now = datetime.now(timezone.utc)
     if args.preview:
-        counts = {"reviews": 22, "issues": 0, "pull_requests": 13, "commits": 65}
+        activity = Activity(
+            counts={"reviews": 22, "issues": 0, "pull_requests": 13, "commits": 65},
+            public_repositories=("CruidGals/surviv", "dumrich/MacroMate"),
+            other_public_repositories=0,
+        )
     else:
         token = os.environ.get("GH_PROFILE_TOKEN", "")
         if not token and os.environ.get("GITHUB_ACTIONS") == "true":
             print("::error title=Missing profile token::GH_PROFILE_TOKEN is not available", flush=True)
         try:
-            counts = fetch_counts(token, now)
+            activity = fetch_activity(token, now)
         except RestrictedContributionsError:
             if os.environ.get("GITHUB_ACTIONS") == "true":
                 print(
@@ -212,8 +311,11 @@ def main() -> None:
                 )
             raise
     args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(render_svg(counts, now, preview=args.preview), encoding="utf-8")
-    print(f"Wrote {args.output}{' preview' if args.preview else f' from {sum(counts.values())} contributions'}")
+    args.output.write_text(render_svg(activity, now, preview=args.preview), encoding="utf-8")
+    print(
+        f"Wrote {args.output}"
+        f"{' preview' if args.preview else f' from {sum(activity.counts.values())} contributions'}"
+    )
 
 
 if __name__ == "__main__":

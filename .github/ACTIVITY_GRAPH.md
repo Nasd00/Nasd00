@@ -1,6 +1,8 @@
 # Activity graph setup
 
-The graph uses the four `contributionsCollection` totals from GitHub's GraphQL API for the past 365 days. It publishes only category counts and percentages, never private repository names or URLs.
+The graph uses the four `contributionsCollection` totals from GitHub's GraphQL API for the past 365 days. The repository list contains only public repositories. Private repository names and URLs are never published.
+
+The account owner reports code reviews that GitHub's contribution API currently returns as zero. When the calculated code review share would display as 0%, the graph shows a 1% minimum and subtracts one point from the largest displayed category. The SVG description records this display rule.
 
 To include private contributions, create a classic personal access token for **Nasd00** with the `read:user` scope. Add it to this repository's Actions secrets as `GH_PROFILE_TOKEN`. A push to the graph branch or `main` runs the workflow immediately; it also refreshes the image daily after this branch is merged into the default branch.
 
