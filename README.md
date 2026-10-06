@@ -56,6 +56,16 @@ prev: SWE Intern @ Qualcomm, ML Intern @ Lockheed Martin
 
 ---
 
+### Activity mix
+
+<p align="center">
+  <img src="assets/activity-graph.svg" alt="Share of commits, pull requests, issues, and code reviews over the past 365 days" width="620">
+</p>
+
+The graph updates daily from GitHub contributions, including private repositories available to my account. The current image is a preview based on the supplied reference until the first authenticated update.
+
+---
+
 ### My work 👇
 
 > **Surviv** 
